@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Story | HeartViz Analytics</title>
+    <meta name="description"
+        content="A data-driven narrative on heart disease trends, risks, and prevention in India." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .story-hero {
+            text-align: center;
+            padding: 4rem 2rem 2.5rem;
+            background: radial-gradient(ellipse at center top, rgba(248, 113, 113, 0.08) 0%, transparent 70%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .story-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+
+        .story-hero h1 span {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .story-hero p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1rem;
+        }
+
+        .story-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 2.5rem;
+        }
+
+        .story-chapter {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .story-chapter.reverse {
+            direction: rtl;
+        }
+
+        .story-chapter.reverse>* {
+            direction: ltr;
+        }
+
+        @media(max-width:800px) {
+
+            .story-chapter,
+            .story-chapter.reverse {
+                grid-template-columns: 1fr;
+                direction: ltr;
+            }
+        }
+
+        .chapter-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.25;
+        }
+
+        .chapter-body {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.8;
+        }
+
+        .chapter-stat {
+            display: inline-block;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-coral);
+            margin: 0.75rem 0;
+        }
+
+        .chapter-callout {
+            background: rgba(248, 113, 113, 0.07);
+            border-left: 3px solid var(--accent-coral);
+            border-radius: 0 8px 8px 0;
+            padding: 0.85rem 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .chart-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: border-color 0.3s;
+        }
+
+        .chart-box:hover {
+            border-color: var(--border-hover);
+        }
+
+        .chart-box-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.65rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-teal), var(--accent-purple));
+            border-radius: 2px;
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 1.75rem;
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -2.05rem;
+            top: 0.3rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            border: 2px solid var(--bg-primary);
+        }
+
+        .tl-year {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            letter-spacing: 0.1em;
+        }
+
+        .tl-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tl-text strong {
+            color: var(--text-primary);
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.06), rgba(56, 189, 248, 0.06));
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .conclusion-box h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .concl-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .concl-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .concl-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .concl-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .concl-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <div class="nav-logo">❤️</div>
+            <div>
+                <div class="nav-title">HeartViz Analytics</div>
+                <div class="nav-subtitle">Tableau-Style Dashboard</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('data_prep') }}">Data Prep</a></li>
+            <li><a href="{{ url_for('story') }}" class="active">Story</a></li>
+            <li><a href="{{ url_for('dashboard1') }}">Dr. Sharma</a></li>
+            <li><a href="{{ url_for('dashboard2') }}">Ramesh</a></li>
+            <li><a href="{{ url_for('dashboard3') }}">Anita</a></li>
+            <li><a href="{{ url_for('performance') }}">Performance</a></li>
+        </ul>
+    </nav>
+
+    <!-- Story Hero -->
+    <div class="story-hero">
+        <div class="hero-badge" style="margin-bottom:1.25rem">
+            <span class="pulse">●</span> Data-Driven Narrative
+        </div>
+        <h1>The <span>Silent Epidemic</span><br>Inside India's Heart</h1>
+        <p>A visual story about how lifestyle, geography, and policy shape India's leading cause of death — and what we
+            can do about it.</p>
+    </div>
+
+    <div class="story-container">
+
+        <!-- Chapter 1 -->
+        <div class="story-chapter" style="animation-delay:0.1s">
+            <div>
+                <div class="chapter-num">Chapter 01 · The Scale</div>
+                <h2 class="chapter-title">Every 33 Seconds,<br>a Heart Stops in India</h2>
+                <p class="chapter-body">
+                    Heart disease has surpassed all other causes to become India's #1 killer.
+                    With <strong>17.9 million</strong> global deaths annually, cardiovascular disease
+                    accounts for <strong>32% of all deaths worldwide</strong>. In India alone,
+                    over 2.8 million people die from heart disease each year — that's one person every 11 seconds.
+                </p>
+                <div class="chapter-stat">17.9M</div>
+                <p class="chapter-body">deaths from heart disease globally per year — more than cancer, diabetes, and
+                    respiratory disease combined.</p>
+                <div class="chapter-callout">
+                    💡 The most shocking truth: <strong>80% of these deaths are preventable</strong> with
+                    early detection, lifestyle changes, and timely medical intervention.
+                </div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-box-title">📈 Year-on-Year Prevalence Growth (India)</div>
+                <canvas id="storyTrendChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Chapter 2 -->
+        <div class="story-chapter reverse" style="animation-delay:0.15s">
+            <div>
+                <div class="chapter-num">Chapter 02 · The Risk Makers</div>
+                <h2 class="chapter-title">Lifestyle Choices Are<br>Writing the Death Sentence</h2>
+                <p class="chapter-body">
+                    Our data reveals that <strong>poor diet, physical inactivity, and smoking</strong>
+                    together account for <strong>58% of all heart disease risk</strong> in the dataset.
+                    These are modifiable risk factors — meaning they can be changed.
+                    Yet millions continue to live sedentary lives, smoke heavily, and eat poorly.
+                </p>
+                <p class="chapter-body" style="margin-top:0.75rem">
+                    Patients who exercise daily have only an <strong>11% heart disease rate</strong>
+                    compared to <strong>72%</strong> for those who never exercise. That is a
+                    6.5× difference driven purely by one habit.
+                </p>
+                <div class="chapter-callout">
+                    🚬 Heavy smokers had a <strong>68% disease rate</strong> vs 14% for non-smokers — a
+                    4.9× increase in risk from a single avoidable habit.
+                </div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-box-title">🔑 Risk Factor Contribution Breakdown</div>
+                <canvas id="storyRiskChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Chapter 3 — Timeline -->
+        <div class="story-chapter" style="animation-delay:0.2s">
+            <div>
+                <div class="chapter-num">Chapter 03 · The Divide</div>
+                <h2 class="chapter-title">Urban India Burns Faster<br>Than Rural India</h2>
+                <p class="chapter-body">
+                    Urban prevalence has nearly <strong>doubled since 2015</strong>, driven by
+                    sedentary desk jobs, fast-food culture, and extreme stress.
+                    Rural areas are catching up fast — rising from 10.1% to 18.5% over the decade —
+                    as lifestyle habits urbanize without the healthcare infrastructure to match.
+                </p>
+                <div class="timeline">
+                    <div class="tl-item">
+                        <div class="tl-dot"></div>
+                        <div class="tl-year">2015</div>
+                        <div class="tl-text">Urban: <strong>18.2%</strong> · Rural <strong>10.1%</strong> — Urban 1.8×
+                            higher</div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-dot" style="background:var(--accent-yellow)"></div>
+                        <div class="tl-year">2018</div>
+                        <div class="tl-text">Urban: <strong>21.5%</strong> · Rural <strong>12.0%</strong> — Gap widens
+                            to 9.5%</div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-dot" style="background:var(--accent-coral)"></div>
+                        <div class="tl-year">2020</div>
+                        <div class="tl-text">Post-COVID surge: Urban <strong>24.1%</strong>, rural
+                            <strong>14.5%</strong></div>
+                    </div>
+                    <div class="tl-item">
+                        <div class="tl-dot" style="background:var(--accent-purple)"></div>
+                        <div class="tl-year">2024</div>
+                        <div class="tl-text">Urban: <strong>29.4%</strong> · Rural <strong>18.5%</strong> — Crisis point
+                            reached</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-box-title">🏙️ Urban vs Rural Prevalence Trend (2015–2024)</div>
+                <canvas id="storyUrbanChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Chapter 4 -->
+        <div class="story-chapter reverse" style="animation-delay:0.25s">
+            <div>
+                <div class="chapter-num">Chapter 04 · The Age Trap</div>
+                <h2 class="chapter-title">Heart Disease is Getting<br>Younger, Faster</h2>
+                <p class="chapter-body">
+                    The average age of diagnosis has fallen to <strong>55 years</strong>, down 2 years
+                    from a decade ago. The 50–69 age band accounts for <strong>60% of all cases</strong>,
+                    but alarmingly, younger groups (30–49) are showing rapid growth in prevalence.
+                </p>
+                <p class="chapter-body" style="margin-top:0.75rem">
+                    The message for anyone nearing <strong>40 with risk factors</strong>:
+                    proactive screening is no longer optional — it's life-saving.
+                    High BMI in the 30–49 group is the strongest early warning signal.
+                </p>
+                <div class="chapter-callout">
+                    📊 <strong>41% of the 503 patients</strong> in this dataset were diagnosed with heart disease.
+                    That's 4 in 10 adults — a proportion that should alarm every household.
+                </div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-box-title">👥 Age Group Distribution — Disease vs No Disease</div>
+                <canvas id="storyAgeChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="conclusion-box" style="animation:fadeInUp 0.6s ease 0.3s both">
+            <h3>💡 The Story Ends With a Choice</h3>
+            <p style="color:var(--text-secondary); max-width:600px; margin:0 auto; font-size:0.92rem; line-height:1.7">
+                The data is clear. Heart disease doesn't strike randomly — it follows patterns in our choices,
+                our environments, and our access to care. These patterns can be broken.
+            </p>
+            <div class="concl-grid">
+                <div class="concl-item">
+                    <div class="concl-icon">🏃</div>
+                    <div class="concl-title">Move Every Day</div>
+                    <div class="concl-desc">Even 30 mins of walking cuts risk by 40%</div>
+                </div>
+                <div class="concl-item">
+                    <div class="concl-icon">🥗</div>
+                    <div class="concl-title">Eat Clean</div>
+                    <div class="concl-desc">Mediterranean-style diet reduces cardiac events by 35%</div>
+                </div>
+                <div class="concl-item">
+                    <div class="concl-icon">🚭</div>
+                    <div class="concl-title">Quit Smoking</div>
+                    <div class="concl-desc">Risk drops to near-normal within 2 years of quitting</div>
+                </div>
+                <div class="concl-item">
+                    <div class="concl-icon">🩺</div>
+                    <div class="concl-title">Screen Early</div>
+                    <div class="concl-desc">Annual checkups at age 40+ detect problems before they're fatal</div>
+                </div>
+                <div class="concl-item">
+                    <div class="concl-icon">🏛️</div>
+                    <div class="concl-title">Push Policy</div>
+                    <div class="concl-desc">Stronger tobacco laws and fitness subsidies save thousands</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer style="margin-top:4rem">
+        <p>Data Story · HeartViz Analytics · <span>A narrative built on evidence</span></p>
+        <p style="margin-top:0.4rem">All data is synthetic and for educational purposes only.</p>
+    </footer>
+
+    <script>
+        const COLORS = {
+            teal: '#2dd4bf', blue: '#38bdf8', coral: '#f87171', green: '#34d399',
+            purple: '#a78bfa', yellow: '#fbbf24'
+        };
+        const gridColor = 'rgba(255,255,255,0.05)';
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+
+        // Trend chart
+        fetch('/api/year-trend')
+            .then(r => r.json())
+            .then(d => {
+                new Chart(document.getElementById('storyTrendChart'), {
+                    type: 'line',
+                    data: {
+                        labels: d.labels,
+                        datasets: [
+                            { label: 'Urban', data: d.urban, borderColor: COLORS.coral, backgroundColor: COLORS.coral + '18', tension: 0.4, fill: true, pointRadius: 4 },
+                            { label: 'Rural', data: d.rural, borderColor: COLORS.teal, backgroundColor: COLORS.teal + '18', tension: 0.4, fill: true, pointRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'top' } },
+                        scales: {
+                            x: { grid: { color: gridColor } },
+                            y: { grid: { color: gridColor }, title: { display: true, text: 'Prevalence %' } }
+                        }
+                    }
+                });
+            });
+
+        // Risk factors
+        fetch('/api/risk-factors')
+            .then(r => r.json())
+            .then(d => {
+                new Chart(document.getElementById('storyRiskChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: d.labels,
+                        datasets: [{
+                            label: 'Contribution %', data: d.values, backgroundColor: [
+                                COLORS.coral + 'cc', COLORS.purple + 'cc', COLORS.yellow + 'cc', COLORS.blue + 'cc',
+                                COLORS.teal + 'cc', COLORS.green + 'cc', '#818cf8cc', '#f472b6cc'
+                            ], borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { callback: v => v + '%' } },
+                            y: { grid: { color: 'transparent' } }
+                        }
+                    }
+                });
+            });
+
+        // Urban chart
+        fetch('/api/year-trend')
+            .then(r => r.json())
+            .then(d => {
+                new Chart(document.getElementById('storyUrbanChart'), {
+                    type: 'line',
+                    data: {
+                        labels: d.labels,
+                        datasets: [
+                            { label: 'Urban %', data: d.urban, borderColor: COLORS.purple, backgroundColor: COLORS.purple + '18', tension: 0.4, fill: true },
+                            { label: 'Rural %', data: d.rural, borderColor: COLORS.green, backgroundColor: COLORS.green + '18', tension: 0.4, fill: true }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'top' } },
+                        scales: {
+                            x: { grid: { color: gridColor } },
+                            y: { grid: { color: gridColor }, title: { display: true, text: 'Prevalence %' } }
+                        }
+                    }
+                });
+            });
+
+        // Age chart
+        fetch('/api/age-risk')
+            .then(r => r.json())
+            .then(d => {
+                new Chart(document.getElementById('storyAgeChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: d.labels,
+                        datasets: [
+                            { label: 'No Disease', data: d.noDisease, backgroundColor: COLORS.green + 'bb', borderRadius: 5 },
+                            { label: 'Heart Disease', data: d.disease, backgroundColor: COLORS.coral + 'bb', borderRadius: 5 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'top' } },
+                        scales: {
+                            x: { grid: { color: gridColor } },
+                            y: { grid: { color: gridColor }, beginAtZero: true, title: { display: true, text: 'Patients' } }
+                        }
+                    }
+                });
+            });
+    </script>
+
+</body>
+
+</html>

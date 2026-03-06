@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anita's Risk Monitor — Personal Health Dashboard | HeartViz</title>
+    <meta name="description"
+        content="Personalized heart disease risk monitor for Anita — tracking cholesterol, blood pressure, BMI vs healthy benchmarks." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <div class="nav-logo">❤️</div>
+            <div>
+                <div class="nav-title">HeartViz Analytics</div>
+                <div class="nav-subtitle">Tableau-Style Dashboard</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('data_prep') }}">Data Prep</a></li>
+            <li><a href="{{ url_for('story') }}">Story</a></li>
+            <li><a href="{{ url_for('dashboard1') }}">Dr. Sharma</a></li>
+            <li><a href="{{ url_for('dashboard2') }}">Ramesh</a></li>
+            <li><a href="{{ url_for('dashboard3') }}" class="active">Anita</a></li>
+            <li><a href="{{ url_for('performance') }}">Performance</a></li>
+        </ul>
+    </nav>
+
+    <div class="dash-header">
+        <div class="dash-breadcrumb"><a href="{{ url_for('home') }}">Home</a> / Scenario 3</div>
+        <div class="dash-title-row">
+            <div class="dash-icon" style="background:rgba(251,191,36,0.15)">👩</div>
+            <div class="dash-info">
+                <h1>Anita — Personal Heart Risk Monitor</h1>
+                <p>Age 45 · Female · Family history of heart disease · Personalized health tracking dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div style="padding:1.25rem 2.5rem 0; max-width:1400px; margin:0 auto;">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#f87171">62</div>
+                <div class="kpi-label">Overall Risk Score /100</div>
+                <div class="kpi-change kpi-up">↑ Moderate-High Risk</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#fbbf24">238</div>
+                <div class="kpi-label">Cholesterol (mg/dL)</div>
+                <div class="kpi-change kpi-up">↑ Above 200 benchmark</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#fbbf24">132</div>
+                <div class="kpi-label">Blood Pressure (mmHg)</div>
+                <div class="kpi-change kpi-up">↑ Stage 1 hypertension</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#fbbf24">27.4</div>
+                <div class="kpi-label">BMI (kg/m²)</div>
+                <div class="kpi-change">Overweight range</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#f87171">2</div>
+                <div class="kpi-label">Exercise Days/Week</div>
+                <div class="kpi-change kpi-up">↓ Below 5 days target</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS GRID -->
+    <div class="dash-grid">
+
+        <!-- Risk Gauge -->
+        <div class="chart-card span-4" style="animation-delay:0.1s">
+            <div class="chart-title">Overall Heart Disease Risk Score</div>
+            <div class="chart-subtitle">Composite score based on all health indicators</div>
+            <div class="chart-wrap gauge-container">
+                <canvas id="gaugeChart" height="220"></canvas>
+                <div class="risk-score-label" style="color:#f87171">62<span style="font-size:1rem">/100</span></div>
+                <div class="risk-score-sub">⚠️ Moderate-High Risk</div>
+            </div>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="chart-card span-8" style="animation-delay:0.15s">
+            <div class="chart-title">Health Factor Radar — Anita vs Ideal Profile</div>
+            <div class="chart-subtitle">Multi-dimensional comparison against healthy benchmarks (higher = better)</div>
+            <div class="chart-wrap"><canvas id="radarChart" height="300"></canvas></div>
+        </div>
+
+        <!-- Metric Progress Bars -->
+        <div class="chart-card span-6" style="animation-delay:0.2s">
+            <div class="chart-title">Key Metrics vs Healthy Benchmarks</div>
+            <div class="chart-subtitle">Progress bars showing where Anita stands relative to optimal values</div>
+            <div class="metric-list" id="metricBars" style="margin-top:0.5rem;"></div>
+        </div>
+
+        <!-- Benchmark Comparison Chart -->
+        <div class="chart-card span-6" style="animation-delay:0.25s">
+            <div class="chart-title">Anita's Values vs Healthy Benchmarks</div>
+            <div class="chart-subtitle">Radar comparison: Anita (orange) vs Ideal benchmarks (teal)</div>
+            <div class="chart-wrap"><canvas id="benchmarkChart" height="280"></canvas></div>
+        </div>
+
+        <!-- Risk Trend (Simulated Timeline) -->
+        <div class="chart-card span-12" style="animation-delay:0.3s">
+            <div class="chart-title">Projected Risk Score — With vs Without Lifestyle Changes</div>
+            <div class="chart-subtitle">If Anita follows the recommended action steps, her risk score can drop
+                significantly over 12 months</div>
+            <div class="chart-wrap"><canvas id="projectionChart" height="180"></canvas></div>
+        </div>
+
+        <!-- Action Steps -->
+        <div class="chart-card span-12" style="animation-delay:0.35s">
+            <div class="chart-title">✅ Personalized Action Plan</div>
+            <div class="chart-subtitle">Evidence-based steps Anita can take today to reduce her heart disease risk</div>
+            <div class="action-list" id="actionList" style="margin-top:0.75rem;"></div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Anita's Dashboard &nbsp;|&nbsp; HeartViz Analytics &nbsp;|&nbsp; <span>Personal Risk Monitor</span></p>
+        <p style="margin-top:0.4rem;">This dashboard is for educational purposes. Always consult your healthcare
+            provider for medical advice.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
+    <script>
+        const COLORS = { teal: '#2dd4bf', blue: '#38bdf8', purple: '#a78bfa', coral: '#f87171', yellow: '#fbbf24', green: '#34d399' };
+        const gridColor = 'rgba(255,255,255,0.05)';
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+        const anita = HDData.anita;
+
+        // 1. Gauge (Doughnut hack)
+        const gaugeScore = anita.overallRiskScore;
+        new Chart(document.getElementById('gaugeChart'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [gaugeScore, 100 - gaugeScore],
+                    backgroundColor: [
+                        gaugeScore < 30 ? COLORS.green : gaugeScore < 60 ? COLORS.yellow : COLORS.coral,
+                        'rgba(255,255,255,0.05)'
+                    ],
+                    borderWidth: 0,
+                    circumference: 270,
+                    rotation: 225
+                }]
+            },
+            options: {
+                cutout: '78%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                animation: { duration: 1200 }
+            }
+        });
+
+        // 2. Radar
+        new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+                labels: anita.radarData.labels,
+                datasets: [
+                    {
+                        label: 'Anita',
+                        data: anita.radarData.anita,
+                        borderColor: COLORS.coral,
+                        backgroundColor: COLORS.coral + '33',
+                        pointBackgroundColor: COLORS.coral,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Ideal Profile',
+                        data: anita.radarData.ideal,
+                        borderColor: COLORS.teal,
+                        backgroundColor: COLORS.teal + '22',
+                        pointBackgroundColor: COLORS.teal,
+                        borderWidth: 2,
+                        borderDash: [5, 3]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    r: {
+                        min: 0, max: 100,
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        pointLabels: { font: { size: 11 } },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 3. Metric Bars (rendered in HTML)
+        const metricContainer = document.getElementById('metricBars');
+        anita.metrics.forEach(m => {
+            const ratio = m.lower_is_better
+                ? Math.min(m.value / m.max, 1)
+                : Math.min(m.value / m.max, 1);
+            const benchRatio = Math.min(m.benchmark / m.max, 1);
+            const fillPct = (ratio * 100).toFixed(1);
+
+            metricContainer.innerHTML += `
+    <div class="metric-item">
+      <div class="metric-header">
+        <span class="metric-name">${m.name}</span>
+        <span class="metric-val" style="color:${m.status === 'good' ? COLORS.green : m.status === 'warning' ? COLORS.yellow : COLORS.coral}">
+          ${m.value} ${m.unit}
+        </span>
+      </div>
+      <div class="metric-bar-bg">
+        <div class="metric-bar-fill ${m.status}" style="width:${fillPct}%"></div>
+      </div>
+      <div class="metric-benchmark">✓ Healthy benchmark: ${m.benchmark} ${m.unit} &nbsp;|&nbsp; Max scale: ${m.max} ${m.unit}</div>
+    </div>
+  `;
+        });
+
+        // 4. Benchmark Grouped Bar
+        new Chart(document.getElementById('benchmarkChart'), {
+            type: 'bar',
+            data: {
+                labels: anita.metrics.map(m => m.name),
+                datasets: [
+                    { label: 'Anita', data: anita.metrics.map(m => m.value), backgroundColor: COLORS.coral + 'bb', borderRadius: 5 },
+                    { label: 'Benchmark', data: anita.metrics.map(m => m.benchmark), backgroundColor: COLORS.teal + 'bb', borderRadius: 5 }
+                ]
+            },
+            options: {
+                indexAxis: 'y', responsive: true,
+                interaction: { mode: 'index' },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { color: gridColor } },
+                    y: { grid: { color: 'transparent' }, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // 5. Projection Line Chart
+        const months = ['Now', '1M', '2M', '3M', '4M', '5M', '6M', '9M', '12M'];
+        new Chart(document.getElementById('projectionChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'With Lifestyle Changes',
+                        data: [62, 58, 55, 51, 48, 44, 41, 35, 29],
+                        borderColor: COLORS.green, backgroundColor: COLORS.green + '22', tension: 0.4, fill: true, pointRadius: 4
+                    },
+                    {
+                        label: 'Without Changes (Current Trajectory)',
+                        data: [62, 63, 65, 67, 69, 71, 73, 77, 81],
+                        borderColor: COLORS.coral, backgroundColor: COLORS.coral + '15', tension: 0.4, fill: true, pointRadius: 4,
+                        borderDash: [6, 4]
+                    }
+                ]
+            },
+            options: {
+                responsive: true, interaction: { mode: 'index' },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { color: gridColor }, title: { display: true, text: 'Time' } },
+                    y: { grid: { color: gridColor }, min: 20, max: 90, title: { display: true, text: 'Risk Score /100' } }
+                }
+            }
+        });
+
+        // 6. Action Steps (HTML rendered)
+        const actionContainer = document.getElementById('actionList');
+        anita.actionSteps.forEach((step, i) => {
+            actionContainer.innerHTML += `
+    <div class="action-item" style="animation-delay:${0.1 * i}s">
+      <div class="action-icon">${step.icon}</div>
+      <div class="action-text">
+        <h4>${step.title}</h4>
+        <p>${step.desc}</p>
+      </div>
+      <span class="priority-badge priority-${step.priority}">${step.priority}</span>
+    </div>
+  `;
+        });
+    </script>
+</body>
+
+</html>

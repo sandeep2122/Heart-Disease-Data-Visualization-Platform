@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Preparation | HeartViz Analytics</title>
+  <meta name="description" content="Data collection, extraction and preparation pipeline for heart disease analytics." />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .pipeline-steps { display:flex; align-items:flex-start; gap:0; flex-wrap:wrap; margin:1.5rem 0; }
+    .pipe-step {
+      display:flex; flex-direction:column; align-items:center; flex:1; min-width:120px;
+      position:relative;
+    }
+    .pipe-step:not(:last-child)::after {
+      content:'→';
+      position:absolute; right:-12px; top:22px;
+      font-size:1.2rem; color:var(--accent-teal); z-index:1;
+    }
+    .pipe-icon {
+      width:52px; height:52px; border-radius:14px;
+      background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.25);
+      display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+      margin-bottom:0.5rem;
+    }
+    .pipe-label { font-size:0.72rem; font-weight:600; color:var(--text-secondary); text-align:center; }
+
+    .table-wrap { overflow-x:auto; margin-top:1rem; }
+    table.data-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .data-table th {
+      background:rgba(255,255,255,0.04); padding:0.65rem 1rem;
+      text-align:left; font-size:0.72rem; font-weight:600; color:var(--text-secondary);
+      letter-spacing:0.06em; text-transform:uppercase;
+      border-bottom:1px solid var(--border);
+    }
+    .data-table td { padding:0.65rem 1rem; border-bottom:1px solid rgba(255,255,255,0.03); }
+    .data-table tr:hover td { background:rgba(255,255,255,0.02); }
+    .data-table td:first-child { color:var(--accent-teal); font-weight:600; }
+
+    .badge { display:inline-block; padding:0.2rem 0.65rem; border-radius:999px; font-size:0.7rem; font-weight:700; }
+    .badge-ok   { background:rgba(52,211,153,0.15); color:#34d399; border:1px solid rgba(52,211,153,0.3); }
+    .badge-warn { background:rgba(251,191,36,0.15);  color:#fbbf24; border:1px solid rgba(251,191,36,0.3); }
+    .badge-bad  { background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+
+    .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-top:1rem; }
+    .stat-box {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+      padding:1.25rem; text-align:center;
+    }
+    .stat-num { font-family:'Outfit',sans-serif; font-size:1.7rem; font-weight:800; color:var(--accent-teal); }
+    .stat-lbl { font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem; }
+
+    .step-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+      padding:1.25rem 1.5rem; margin-bottom:0.75rem; display:flex; gap:1.25rem; align-items:flex-start;
+      transition:border-color 0.2s;
+    }
+    .step-card:hover { border-color:var(--border-hover); }
+    .step-num {
+      min-width:32px; height:32px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent-teal),var(--accent-blue));
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.8rem; font-weight:800; color:#0a0e1a; flex-shrink:0;
+    }
+    .step-body h4 { font-size:0.9rem; font-weight:600; margin-bottom:0.25rem; }
+    .step-body p  { font-size:0.8rem; color:var(--text-secondary); line-height:1.6; }
+    .step-body code {
+      background:rgba(255,255,255,0.06); padding:0.15rem 0.45rem;
+      border-radius:4px; font-size:0.75rem; color:var(--accent-purple);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="{{ url_for('home') }}" class="nav-brand">
+      <div class="nav-logo">❤️</div>
+      <div>
+        <div class="nav-title">HeartViz Analytics</div>
+        <div class="nav-subtitle">Tableau-Style Dashboard</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('data_prep') }}" class="active">Data Prep</a></li>
+      <li><a href="{{ url_for('story') }}">Story</a></li>
+      <li><a href="{{ url_for('dashboard1') }}">Dr. Sharma</a></li>
+      <li><a href="{{ url_for('dashboard2') }}">Ramesh</a></li>
+      <li><a href="{{ url_for('dashboard3') }}">Anita</a></li>
+      <li><a href="{{ url_for('performance') }}">Performance</a></li>
+    </ul>
+  </nav>
+
+  <div class="dash-header">
+    <div class="dash-breadcrumb">
+      <a href="{{ url_for('home') }}">Home</a> / Data Preparation
+    </div>
+    <div class="dash-title-row">
+      <div class="dash-icon" style="background:rgba(167,139,250,0.15)">🗄️</div>
+      <div class="dash-info">
+        <h1>Data Collection &amp; Preparation Pipeline</h1>
+        <p>From raw database extraction to cleaned, analysis-ready dataset · SQLite Backend</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+
+    <!-- Pipeline Overview -->
+    <div class="chart-card span-12" style="animation-delay:0.05s">
+      <div class="chart-title">📦 ETL Pipeline Overview</div>
+      <div class="chart-subtitle">End-to-end flow from source database to visualization</div>
+      <div class="pipeline-steps">
+        <div class="pipe-step">
+          <div class="pipe-icon">🗃️</div>
+          <div class="pipe-label">SQLite<br>Database</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📤</div>
+          <div class="pipe-label">SQL<br>Extraction</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">🔍</div>
+          <div class="pipe-label">Null Check<br>&amp; Dedup</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📐</div>
+          <div class="pipe-label">Type<br>Casting</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">🏷️</div>
+          <div class="pipe-label">Encode<br>Categories</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📊</div>
+          <div class="pipe-label">Load to<br>Flask API</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📈</div>
+          <div class="pipe-label">Chart.js<br>Render</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dataset Stats -->
+    <div class="chart-card span-12" style="animation-delay:0.1s" id="statsCard">
+      <div class="chart-title">📊 Dataset Summary Statistics</div>
+      <div class="chart-subtitle">Raw data extracted from <code>heart_disease.db → patients</code> table</div>
+      <div class="stat-row" id="statRow">
+        <div class="stat-box"><div class="stat-num" id="statTotal">—</div><div class="stat-lbl">Total Records</div></div>
+        <div class="stat-box"><div class="stat-num" id="statHD">—</div><div class="stat-lbl">Heart Disease Cases</div></div>
+        <div class="stat-box"><div class="stat-num" id="statAvgAge">—</div><div class="stat-lbl">Avg. Age</div></div>
+        <div class="stat-box"><div class="stat-num" id="statAvgBMI">—</div><div class="stat-lbl">Avg. BMI</div></div>
+        <div class="stat-box"><div class="stat-num" id="statAvgChol">—</div><div class="stat-lbl">Avg. Cholesterol (mg/dL)</div></div>
+        <div class="stat-box"><div class="stat-num" id="statMissing">0%</div><div class="stat-lbl">Missing Values</div></div>
+      </div>
+    </div>
+
+    <!-- Column Info Table -->
+    <div class="chart-card span-8" style="animation-delay:0.15s">
+      <div class="chart-title">🗂️ Schema &amp; Column Quality Report</div>
+      <div class="chart-subtitle">Column-level profiling from the patients table</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Column</th><th>Type</th><th>Non-Null</th><th>Unique Values</th><th>Quality</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>id</td><td>INTEGER</td><td>503 / 503</td><td>503</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>age</td><td>INTEGER</td><td>503 / 503</td><td>56</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>gender</td><td>TEXT</td><td>503 / 503</td><td>2</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>bmi</td><td>REAL</td><td>503 / 503</td><td>~480</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>cholesterol</td><td>INTEGER</td><td>503 / 503</td><td>201</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>blood_pressure</td><td>INTEGER</td><td>503 / 503</td><td>101</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>smoking</td><td>TEXT</td><td>503 / 503</td><td>4</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>exercise</td><td>TEXT</td><td>503 / 503</td><td>5</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>diabetes</td><td>INTEGER</td><td>503 / 503</td><td>2</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>family_history</td><td>INTEGER</td><td>503 / 503</td><td>2</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>heart_disease</td><td>INTEGER</td><td>503 / 503</td><td>2</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>region</td><td>TEXT</td><td>503 / 503</td><td>8</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+            <tr><td>year</td><td>INTEGER</td><td>503 / 503</td><td>10</td><td><span class="badge badge-ok">✓ Clean</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Preparation Steps -->
+    <div class="chart-card span-4" style="animation-delay:0.2s">
+      <div class="chart-title">🧹 Preparation Steps Applied</div>
+      <div class="chart-subtitle">Transformations performed on raw data</div>
+      <div style="margin-top:0.5rem">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Null Value Check</h4>
+            <p>Verified all 503 rows have no NULL values across all 13 columns. <code>NULL count: 0</code></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Duplicate Removal</h4>
+            <p>Checked for duplicate patient IDs. <code>Duplicates found: 0</code></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Outlier Detection</h4>
+            <p>BMI clipped to [14, 50], Cholesterol to [100, 400], BP to [60, 200]. <code>Outliers removed: 0</code></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>Label Encoding</h4>
+            <p>Categorical fields encoded: <code>gender</code>, <code>smoking</code>, <code>exercise</code>, <code>region</code></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h4>Feature Aggregation</h4>
+            <p>Grouped data by age bands, BMI categories, and smoking levels for visualization.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribution Chart -->
+    <div class="chart-card span-6" style="animation-delay:0.25s">
+      <div class="chart-title">📉 Age Distribution of Patients</div>
+      <div class="chart-subtitle">Before vs After age-band grouping</div>
+      <div class="chart-wrap"><canvas id="ageDistChart" height="260"></canvas></div>
+    </div>
+
+    <div class="chart-card span-6" style="animation-delay:0.3s">
+      <div class="chart-title">⚖️ Class Balance — Heart Disease vs No Disease</div>
+      <div class="chart-subtitle">Target variable distribution in the cleaned dataset</div>
+      <div class="chart-wrap"><canvas id="classChart" height="260"></canvas></div>
+    </div>
+
+    <!-- Sample Raw Data Table -->
+    <div class="chart-card span-12" style="animation-delay:0.35s">
+      <div class="chart-title">📋 Sample Raw Data — First 10 Records</div>
+      <div class="chart-subtitle">Extracted directly from <code>patients</code> table in SQLite database</div>
+      <div class="table-wrap">
+        <table class="data-table" id="sampleTable">
+          <thead>
+            <tr>
+              <th>ID</th><th>Age</th><th>Gender</th><th>BMI</th>
+              <th>Cholesterol</th><th>BP</th><th>Smoking</th>
+              <th>Exercise</th><th>Diabetes</th><th>Fam. History</th>
+              <th>Region</th><th>Heart Disease</th>
+            </tr>
+          </thead>
+          <tbody id="sampleBody">
+            <tr><td colspan="12" style="text-align:center;color:var(--text-muted)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Data Preparation · HeartViz Analytics · <span>SQLite + Flask Backend</span></p>
+    <p style="margin-top:0.4rem">All data is synthetic and for educational purposes only.</p>
+  </footer>
+
+  <script>
+    const COLORS = {
+      teal:'#2dd4bf', blue:'#38bdf8', purple:'#a78bfa',
+      coral:'#f87171', yellow:'#fbbf24', green:'#34d399'
+    };
+    const gridColor = 'rgba(255,255,255,0.05)';
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+
+    // Fetch DB stats
+    fetch('/api/db-stats')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('statTotal').textContent   = d.total;
+        document.getElementById('statHD').textContent      = d.hd_count;
+        document.getElementById('statAvgAge').textContent  = d.avg_age;
+        document.getElementById('statAvgBMI').textContent  = d.avg_bmi;
+        document.getElementById('statAvgChol').textContent = d.avg_chol;
+      });
+
+    // Fetch sample records
+    fetch('/api/sample-records')
+      .then(r => r.json())
+      .then(rows => {
+        const tbody = document.getElementById('sampleBody');
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td>${r.id}</td><td>${r.age}</td><td>${r.gender}</td><td>${r.bmi}</td>
+            <td>${r.cholesterol}</td><td>${r.blood_pressure}</td><td>${r.smoking}</td>
+            <td>${r.exercise}</td><td>${r.diabetes}</td><td>${r.family_history}</td>
+            <td>${r.region}</td>
+            <td><span class="badge ${r.heart_disease ? 'badge-bad' : 'badge-ok'}">${r.heart_disease ? 'Yes' : 'No'}</span></td>
+          </tr>`).join('');
+      });
+
+    // Age distribution chart
+    fetch('/api/age-dist')
+      .then(r => r.json())
+      .then(d => {
+        new Chart(document.getElementById('ageDistChart'), {
+          type: 'bar',
+          data: {
+            labels: d.labels,
+            datasets: [
+              { label: 'No Disease', data: d.noDisease, backgroundColor: COLORS.green + 'bb', borderRadius: 5 },
+              { label: 'Heart Disease', data: d.disease, backgroundColor: COLORS.coral + 'bb', borderRadius: 5 }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              x: { grid: { color: gridColor } },
+              y: { grid: { color: gridColor }, beginAtZero: true, title: { display: true, text: 'Patients' } }
+            }
+          }
+        });
+      });
+
+    // Class balance doughnut
+    fetch('/api/class-balance')
+      .then(r => r.json())
+      .then(d => {
+        new Chart(document.getElementById('classChart'), {
+          type: 'doughnut',
+          data: {
+            labels: d.labels,
+            datasets: [{ data: d.values, backgroundColor: [COLORS.green + 'cc', COLORS.coral + 'cc'], borderWidth: 0, hoverOffset: 8 }]
+          },
+          options: {
+            cutout: '60%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 16 } } },
+            animation: { animateRotate: true, duration: 1000 }
+          }
+        });
+      });
+  </script>
+
+</body>
+</html>

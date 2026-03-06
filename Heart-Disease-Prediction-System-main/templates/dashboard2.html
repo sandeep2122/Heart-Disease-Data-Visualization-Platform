@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ramesh Dashboard — Regional Prevalence & Policy | HeartViz</title>
+    <meta name="description"
+        content="Government health analyst view of regional heart disease trends and policy recommendations." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <div class="nav-logo">❤️</div>
+            <div>
+                <div class="nav-title">HeartViz Analytics</div>
+                <div class="nav-subtitle">Tableau-Style Dashboard</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('data_prep') }}">Data Prep</a></li>
+            <li><a href="{{ url_for('story') }}">Story</a></li>
+            <li><a href="{{ url_for('dashboard1') }}">Dr. Sharma</a></li>
+            <li><a href="{{ url_for('dashboard2') }}" class="active">Ramesh</a></li>
+            <li><a href="{{ url_for('dashboard3') }}">Anita</a></li>
+            <li><a href="{{ url_for('performance') }}">Performance</a></li>
+        </ul>
+    </nav>
+
+    <div class="dash-header">
+        <div class="dash-breadcrumb"><a href="{{ url_for('home') }}">Home</a> / Scenario 2</div>
+        <div class="dash-title-row">
+            <div class="dash-icon" style="background:rgba(167,139,250,0.15)">🏛️</div>
+            <div class="dash-info">
+                <h1>Ramesh — Regional Prevalence & Policy Analysis</h1>
+                <p>Heart disease trends across urban and rural India · Government Health Department</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div style="padding:1.25rem 2.5rem 0; max-width:1400px; margin:0 auto;">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#a78bfa">29.4%</div>
+                <div class="kpi-label">Urban Prevalence (2024)</div>
+                <div class="kpi-change kpi-up">↑ 11.2% since 2015</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#38bdf8">18.5%</div>
+                <div class="kpi-label">Rural Prevalence (2024)</div>
+                <div class="kpi-change kpi-up">↑ 8.4% since 2015</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#fbbf24">1.59x</div>
+                <div class="kpi-label">Urban vs Rural Gap</div>
+                <div class="kpi-change">Urban risk is 59% higher</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#f87171">22%</div>
+                <div class="kpi-label">Poor Diet Contribution</div>
+                <div class="kpi-change">Largest single risk factor</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" style="color:#34d399">25%</div>
+                <div class="kpi-label">Risk Reduction from Tobacco Policy</div>
+                <div class="kpi-change kpi-down">Highest policy impact</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS GRID -->
+    <div class="dash-grid">
+
+        <!-- Regional Urban vs Rural -->
+        <div class="chart-card span-8" style="animation-delay:0.1s">
+            <div class="chart-title">Heart Disease Prevalence by Region (Urban vs Rural)</div>
+            <div class="chart-subtitle">Percentage of population with diagnosed heart disease (%)</div>
+            <div class="chart-wrap"><canvas id="regionalChart" height="240"></canvas></div>
+        </div>
+
+        <!-- Risk Factor Breakdown Donut -->
+        <div class="chart-card span-4" style="animation-delay:0.15s">
+            <div class="chart-title">Risk Factor Breakdown</div>
+            <div class="chart-subtitle">Share of each contributing factor (%)</div>
+            <div class="chart-wrap"><canvas id="riskFactorChart" height="240"></canvas></div>
+        </div>
+
+        <!-- Year Trend Line -->
+        <div class="chart-card span-12" style="animation-delay:0.2s">
+            <div class="chart-title">10-Year Trend — Heart Disease Prevalence (2015–2024)</div>
+            <div class="chart-subtitle">Rising prevalence in both urban and rural populations</div>
+            <div class="chart-wrap"><canvas id="trendChart" height="200"></canvas></div>
+        </div>
+
+        <!-- Sedentary Lifestyle Stacked -->
+        <div class="chart-card span-7" style="animation-delay:0.25s">
+            <div class="chart-title">Sedentary vs Active Lifestyle by Region</div>
+            <div class="chart-subtitle">Percentage of population by activity level (%)</div>
+            <div class="chart-wrap"><canvas id="sedentaryChart" height="260"></canvas></div>
+        </div>
+
+        <!-- Policy Impact -->
+        <div class="chart-card span-5" style="animation-delay:0.3s">
+            <div class="chart-title">Estimated Risk Reduction from Policy Interventions</div>
+            <div class="chart-subtitle">Projected population-level impact of each policy</div>
+            <div class="chart-wrap"><canvas id="policyChart" height="260"></canvas></div>
+        </div>
+
+        <!-- Policy Recommendations Table -->
+        <div class="chart-card span-12" style="animation-delay:0.35s">
+            <div class="chart-title">📋 Policy Recommendations for Decision-Makers</div>
+            <div class="chart-subtitle">Evidence-based interventions Ramesh recommends to the health department</div>
+            <div style="overflow-x:auto; margin-top:0.75rem;">
+                <table class="policy-table">
+                    <thead>
+                        <tr>
+                            <th>Policy Intervention</th>
+                            <th>Target Group</th>
+                            <th>Estimated Impact</th>
+                            <th>Priority</th>
+                            <th>Implementation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tobacco Control & Cessation Programs</strong></td>
+                            <td>All adults, especially urban workers</td>
+                            <td>↓ 25% disease risk</td>
+                            <td><span class="impact-badge impact-high">High</span></td>
+                            <td>Immediate</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mandatory Workplace Fitness Programs</strong></td>
+                            <td>Sedentary urban office workers</td>
+                            <td>↓ 18% disease risk</td>
+                            <td><span class="impact-badge impact-high">High</span></td>
+                            <td>6 months</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Free Annual Health Screenings</strong></td>
+                            <td>Adults aged 40+ in rural areas</td>
+                            <td>↓ 21% late detection</td>
+                            <td><span class="impact-badge impact-high">High</span></td>
+                            <td>12 months</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Subsidies on Healthy Food Options</strong></td>
+                            <td>Low-income urban & rural families</td>
+                            <td>↓ 14% diet risk</td>
+                            <td><span class="impact-badge impact-medium">Medium</span></td>
+                            <td>12–18 months</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Public Awareness Campaigns (TV/Digital)</strong></td>
+                            <td>General population 20–60</td>
+                            <td>↓ 16% risk behaviors</td>
+                            <td><span class="impact-badge impact-medium">Medium</span></td>
+                            <td>3 months</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rural Telemedicine Cardiac Care</strong></td>
+                            <td>Rural populations with limited access</td>
+                            <td>↓ 30% untreated cases</td>
+                            <td><span class="impact-badge impact-medium">Medium</span></td>
+                            <td>18–24 months</td>
+                        </tr>
+                        <tr>
+                            <td><strong>School Nutrition & Physical Education Reform</strong></td>
+                            <td>Children & youth (5–18)</td>
+                            <td>Long-term prevention</td>
+                            <td><span class="impact-badge impact-low">Long-term</span></td>
+                            <td>2–3 years</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Ramesh Dashboard &nbsp;|&nbsp; HeartViz Analytics &nbsp;|&nbsp; <span>Regional Policy Analysis</span></p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
+    <script>
+        const COLORS = { teal: '#2dd4bf', blue: '#38bdf8', purple: '#a78bfa', coral: '#f87171', yellow: '#fbbf24', green: '#34d399' };
+        const gridColor = 'rgba(255,255,255,0.05)';
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+        // 1. Regional Grouped Bar
+        new Chart(document.getElementById('regionalChart'), {
+            type: 'bar',
+            data: {
+                labels: HDData.regionalPrevalence.labels,
+                datasets: [
+                    { label: 'Urban (%)', data: HDData.regionalPrevalence.urban, backgroundColor: COLORS.purple + 'bb', borderRadius: 5 },
+                    { label: 'Rural (%)', data: HDData.regionalPrevalence.rural, backgroundColor: COLORS.blue + 'bb', borderRadius: 5 }
+                ]
+            },
+            options: {
+                responsive: true, interaction: { mode: 'index' },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { color: gridColor } },
+                    y: { grid: { color: gridColor }, ticks: { callback: v => v + '%' }, max: 40, title: { display: true, text: 'Prevalence %' } }
+                }
+            }
+        });
+
+        // 2. Risk Factor Doughnut
+        const rfColors = [COLORS.coral, COLORS.yellow, COLORS.purple, COLORS.blue, COLORS.teal, COLORS.green, '#f97316', '#ec4899'];
+        new Chart(document.getElementById('riskFactorChart'), {
+            type: 'doughnut',
+            data: {
+                labels: HDData.riskFactorBreakdown.labels,
+                datasets: [{ data: HDData.riskFactorBreakdown.values, backgroundColor: rfColors, borderWidth: 0, hoverOffset: 6 }]
+            },
+            options: {
+                cutout: '60%',
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } } }
+            }
+        });
+
+        // 3. Trend Line
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: HDData.yearTrend.labels,
+                datasets: [
+                    { label: 'Urban', data: HDData.yearTrend.urban, borderColor: COLORS.purple, backgroundColor: COLORS.purple + '22', tension: 0.4, fill: true, pointRadius: 4 },
+                    { label: 'Rural', data: HDData.yearTrend.rural, borderColor: COLORS.blue, backgroundColor: COLORS.blue + '22', tension: 0.4, fill: true, pointRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true, interaction: { mode: 'index' },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { color: gridColor } },
+                    y: { grid: { color: gridColor }, ticks: { callback: v => v + '%' }, title: { display: true, text: 'Prevalence %' } }
+                }
+            }
+        });
+
+        // 4. Sedentary Stacked Bar
+        new Chart(document.getElementById('sedentaryChart'), {
+            type: 'bar',
+            data: {
+                labels: HDData.sedentaryByRegion.labels,
+                datasets: [
+                    { label: 'Sedentary', data: HDData.sedentaryByRegion.sedentary, backgroundColor: COLORS.coral + 'cc', borderRadius: 0 },
+                    { label: 'Moderately Active', data: HDData.sedentaryByRegion.moderate, backgroundColor: COLORS.yellow + 'cc' },
+                    { label: 'Active', data: HDData.sedentaryByRegion.active, backgroundColor: COLORS.green + 'cc', borderRadius: [0, 0, 5, 5] }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    x: { stacked: true, grid: { color: gridColor } },
+                    y: { stacked: true, max: 100, grid: { color: gridColor }, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+
+        // 5. Policy Impact Horizontal Bar
+        new Chart(document.getElementById('policyChart'), {
+            type: 'bar',
+            data: {
+                labels: HDData.policyImpact.labels,
+                datasets: [{
+                    label: 'Risk Reduction %', data: HDData.policyImpact.estimatedReduction,
+                    backgroundColor: [COLORS.teal + 'cc', COLORS.green + 'cc', COLORS.blue + 'cc', COLORS.purple + 'cc', COLORS.yellow + 'cc'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { callback: v => v + '%' }, max: 30 },
+                    y: { grid: { color: 'transparent' } }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

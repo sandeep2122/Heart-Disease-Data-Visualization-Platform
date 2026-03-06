@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heart Disease Analytics — Tableau-Style Dashboard</title>
+  <meta name="description"
+    content="Interactive heart disease data visualization dashboards for healthcare providers, policymakers, and individuals." />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="{{ url_for('home') }}" class="nav-brand">
+      <div class="nav-logo">❤️</div>
+      <div>
+        <div class="nav-title">HeartViz Analytics</div>
+        <div class="nav-subtitle">Tableau-Style Health Dashboard</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+      <li><a href="{{ url_for('data_prep') }}">Data Prep</a></li>
+      <li><a href="{{ url_for('story') }}">Story</a></li>
+      <li><a href="{{ url_for('dashboard1') }}">Dr. Sharma</a></li>
+      <li><a href="{{ url_for('dashboard2') }}">Ramesh</a></li>
+      <li><a href="{{ url_for('dashboard3') }}">Anita</a></li>
+      <li><a href="{{ url_for('performance') }}">Performance</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span class="pulse">●</span> Live Analytics Dashboard
+    </div>
+    <h1>Heart Disease Data<br><span>Visualization Platform</span></h1>
+    <p>
+      Transforming raw cardiac health data into actionable intelligence.
+      Interactive dashboards for clinicians, policymakers, and patients—
+      powered by advanced visual analytics.
+    </p>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">17.9M</div>
+        <div class="hero-stat-label">Annual Deaths Worldwide</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">32%</div>
+        <div class="hero-stat-label">Of All Global Deaths</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">80%</div>
+        <div class="hero-stat-label">Preventable with Early Action</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">3</div>
+        <div class="hero-stat-label">Interactive Dashboards</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO DASHBOARDS SECTION -->
+  <section>
+    <div class="section-header">
+      <div class="section-label">📊 Scenario-Based Dashboards</div>
+      <h2>Three Perspectives, One Mission</h2>
+      <p>Select a dashboard tailored to your role and analytical needs</p>
+    </div>
+
+    <div class="scenario-grid">
+
+      <!-- Scenario 1 -->
+      <a href="{{ url_for('dashboard1') }}" class="scenario-card card-1" style="animation-delay:0.1s">
+        <div class="card-icon">🩺</div>
+        <div class="card-tag">Scenario 1 · Clinical Analysis</div>
+        <h3>Dr. Sharma — Lifestyle Risk Factors</h3>
+        <p>
+          Senior cardiologist analyzing lifestyle contributors to heart disease among middle-aged patients.
+          Identify high-risk groups to design targeted awareness campaigns for weight management and smoking cessation.
+        </p>
+        <div class="card-metrics">
+          <span class="metric-pill">Age & Gender</span>
+          <span class="metric-pill">BMI Analysis</span>
+          <span class="metric-pill">Cholesterol</span>
+          <span class="metric-pill">Smoking</span>
+          <span class="metric-pill">Exercise</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <!-- Scenario 2 -->
+      <a href="{{ url_for('dashboard2') }}" class="scenario-card card-2" style="animation-delay:0.2s">
+        <div class="card-icon">🏛️</div>
+        <div class="card-tag">Scenario 2 · Policy Analysis</div>
+        <h3>Ramesh — Regional Prevalence & Policies</h3>
+        <p>
+          Government health analyst studying heart disease trends across urban and rural regions.
+          Correlate sedentary lifestyles with disease rates to recommend targeted health policies.
+        </p>
+        <div class="card-metrics">
+          <span class="metric-pill">Urban vs Rural</span>
+          <span class="metric-pill">Year Trends</span>
+          <span class="metric-pill">Risk Factors</span>
+          <span class="metric-pill">Policy Impact</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <!-- Scenario 3 -->
+      <a href="{{ url_for('dashboard3') }}" class="scenario-card card-3" style="animation-delay:0.3s">
+        <div class="card-icon">👩</div>
+        <div class="card-tag">Scenario 3 · Personal Health Monitor</div>
+        <h3>Anita — Personal Risk Monitor</h3>
+        <p>
+          45-year-old professional with family history of heart disease monitoring her personal risk factors
+          like cholesterol, blood pressure, and lifestyle habits against healthy benchmarks.
+        </p>
+        <div class="card-metrics">
+          <span class="metric-pill">Risk Score</span>
+          <span class="metric-pill">vs Benchmarks</span>
+          <span class="metric-pill">Radar Chart</span>
+          <span class="metric-pill">Action Steps</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section style="padding-top: 1rem;">
+    <div class="section-header">
+      <div class="section-label">ℹ️ About This Project</div>
+      <h2>How Tableau Analytics Helps</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:1.25rem;">
+      <div class="kpi-card" style="text-align:left; padding:1.5rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.75rem;">🔍</div>
+        <h4 style="margin-bottom:0.5rem; font-size:0.95rem;">Uncover Hidden Trends</h4>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+          Interactive visualizations surface patterns in cardiac health data that static reports cannot reveal.
+        </p>
+      </div>
+      <div class="kpi-card" style="text-align:left; padding:1.5rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.75rem;">📈</div>
+        <h4 style="margin-bottom:0.5rem; font-size:0.95rem;">Compare Patient Groups</h4>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+          Segment data by demographics, region, and lifestyle to compare risk profiles across populations.
+        </p>
+      </div>
+      <div class="kpi-card" style="text-align:left; padding:1.5rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.75rem;">💡</div>
+        <h4 style="margin-bottom:0.5rem; font-size:0.95rem;">Drive Preventive Action</h4>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+          Translate complex data into clear, actionable insights for individuals and healthcare providers.
+        </p>
+      </div>
+      <div class="kpi-card" style="text-align:left; padding:1.5rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.75rem;">🏛️</div>
+        <h4 style="margin-bottom:0.5rem; font-size:0.95rem;">Support Policy Decisions</h4>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+          Equip policymakers with data-driven evidence to design and justify effective health interventions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM SECTION -->
+  <section style="padding-top: 1rem;">
+    <div class="section-header">
+      <div class="section-label">👥 Our Team</div>
+      <h2>Meet the Team</h2>
+      <p>The people behind this Heart Disease Analytics project</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.25rem;">
+
+      <!-- Team Leader -->
+      <div class="kpi-card"
+        style="text-align:center; padding:2rem 1.5rem; border-color:rgba(45,212,191,0.3); position:relative; overflow:hidden;">
+        <div
+          style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent-teal),var(--accent-blue));">
+        </div>
+        <div
+          style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-teal),var(--accent-blue));display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#0a0e1a;margin:0 auto 1rem;font-family:'Outfit',sans-serif;">
+          SK</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.3rem;">Sandeep
+          Kumar</div>
+        <div
+          style="display:inline-block;background:rgba(45,212,191,0.15);border:1px solid rgba(45,212,191,0.35);color:var(--accent-teal);font-size:0.7rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.75rem;border-radius:999px;text-transform:uppercase;margin-bottom:0.5rem;">
+          👑 Team Leader</div>
+        <div style="font-size:0.78rem;color:var(--text-secondary);">Data Analysis &amp; Project Lead</div>
+      </div>
+
+      <!-- Member 2 -->
+      <div class="kpi-card" style="text-align:center; padding:2rem 1.5rem;">
+        <div
+          style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-purple),#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#0a0e1a;margin:0 auto 1rem;font-family:'Outfit',sans-serif;">
+          PR</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.3rem;">Pranjal
+        </div>
+        <div
+          style="display:inline-block;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:var(--accent-purple);font-size:0.7rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.75rem;border-radius:999px;text-transform:uppercase;margin-bottom:0.5rem;">
+          Team Member</div>
+        <div style="font-size:0.78rem;color:var(--text-secondary);">Data Visualization</div>
+      </div>
+
+      <!-- Member 3 -->
+      <div class="kpi-card" style="text-align:center; padding:2rem 1.5rem;">
+        <div
+          style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-coral),#f97316);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#0a0e1a;margin:0 auto 1rem;font-family:'Outfit',sans-serif;">
+          RA</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.3rem;">Rashmi
+        </div>
+        <div
+          style="display:inline-block;background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--accent-coral);font-size:0.7rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.75rem;border-radius:999px;text-transform:uppercase;margin-bottom:0.5rem;">
+          Team Member</div>
+        <div style="font-size:0.78rem;color:var(--text-secondary);">Dashboard Design</div>
+      </div>
+
+      <!-- Member 4 -->
+      <div class="kpi-card" style="text-align:center; padding:2rem 1.5rem;">
+        <div
+          style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-yellow),var(--accent-green));display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#0a0e1a;margin:0 auto 1rem;font-family:'Outfit',sans-serif;">
+          SH</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.3rem;">Shristi
+        </div>
+        <div
+          style="display:inline-block;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--accent-green);font-size:0.7rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.75rem;border-radius:999px;text-transform:uppercase;margin-bottom:0.5rem;">
+          Team Member</div>
+        <div style="font-size:0.78rem;color:var(--text-secondary);">Data Analysis</div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>Heart Disease Analytics Platform &nbsp;|&nbsp; Tableau-Style Visualization Project &nbsp;|&nbsp; Built with
+      <span>Chart.js</span>
+    </p>
+    <p style="margin-top:0.4rem;">Data is synthetic and for educational/demonstration purposes only.</p>
+  </footer>
+
+</body>
+
+</html>
